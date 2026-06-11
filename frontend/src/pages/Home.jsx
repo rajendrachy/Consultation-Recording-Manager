@@ -271,6 +271,70 @@ const Home = () => {
           </Link>
         </div>
 
+        {/* Quick Demo Access Cards */}
+        <div className="pt-8 max-w-4xl mx-auto space-y-4">
+          <p className="text-[10px] sm:text-xs font-extrabold uppercase tracking-widest text-slate-400 dark:text-slate-500">
+            ⚡ Quick-Connect Sandbox Portals
+          </p>
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+            
+            {/* Admin Pill Card */}
+            <Link 
+              to="/login?role=admin"
+              className="p-5 bg-white/40 dark:bg-dark-900/40 backdrop-blur-md border border-slate-200 dark:border-dark-800 hover:border-rose-500/30 dark:hover:border-rose-500/40 rounded-3xl flex flex-col items-center text-center space-y-3 transition-all duration-300 hover:scale-[1.03] group relative overflow-hidden shadow-sm hover:shadow-md dark:shadow-none"
+            >
+              <div className="absolute top-0 right-0 w-16 h-16 bg-rose-500/5 rounded-full blur-xl pointer-events-none" />
+              <div className="w-10 h-10 rounded-2xl bg-rose-500/10 text-rose-500 dark:text-rose-450 flex items-center justify-center font-black text-sm">
+                A
+              </div>
+              <div>
+                <h4 className="font-bold text-xs text-slate-800 dark:text-slate-200 group-hover:text-rose-500 dark:group-hover:text-rose-450 transition-colors">System Administrator</h4>
+                <p className="text-[10px] text-slate-500 dark:text-slate-400 font-medium mt-0.5">Manage users, audit trails & override DB</p>
+              </div>
+              <span className="px-3 py-1 bg-rose-500/10 text-rose-600 dark:text-rose-400 text-[9px] font-bold uppercase tracking-wider rounded-xl border border-rose-500/20">
+                Connect
+              </span>
+            </Link>
+
+            {/* Consultant Pill Card */}
+            <Link 
+              to="/login?role=consultant"
+              className="p-5 bg-white/40 dark:bg-dark-900/40 backdrop-blur-md border border-slate-200 dark:border-dark-800 hover:border-teal-500/30 dark:hover:border-teal-500/40 rounded-3xl flex flex-col items-center text-center space-y-3 transition-all duration-300 hover:scale-[1.03] group relative overflow-hidden shadow-sm hover:shadow-md dark:shadow-none"
+            >
+              <div className="absolute top-0 right-0 w-16 h-16 bg-teal-500/5 rounded-full blur-xl pointer-events-none" />
+              <div className="w-10 h-10 rounded-2xl bg-teal-500/10 text-teal-500 dark:text-teal-450 flex items-center justify-center font-black text-sm">
+                C
+              </div>
+              <div>
+                <h4 className="font-bold text-xs text-slate-800 dark:text-slate-200 group-hover:text-teal-500 dark:group-hover:text-teal-450 transition-colors">Clinical Consultant</h4>
+                <p className="text-[10px] text-slate-500 dark:text-slate-400 font-medium mt-0.5">View recordings, search transcripts & notes</p>
+              </div>
+              <span className="px-3 py-1 bg-teal-500/10 text-teal-600 dark:text-teal-400 text-[9px] font-bold uppercase tracking-wider rounded-xl border border-teal-500/20">
+                Connect
+              </span>
+            </Link>
+
+            {/* Staff Pill Card */}
+            <Link 
+              to="/login?role=staff"
+              className="p-5 bg-white/40 dark:bg-dark-900/40 backdrop-blur-md border border-slate-200 dark:border-dark-800 hover:border-blue-500/30 dark:hover:border-blue-500/40 rounded-3xl flex flex-col items-center text-center space-y-3 transition-all duration-300 hover:scale-[1.03] group relative overflow-hidden shadow-sm hover:shadow-md dark:shadow-none"
+            >
+              <div className="absolute top-0 right-0 w-16 h-16 bg-blue-500/5 rounded-full blur-xl pointer-events-none" />
+              <div className="w-10 h-10 rounded-2xl bg-blue-500/10 text-blue-500 dark:text-blue-450 flex items-center justify-center font-black text-sm">
+                S
+              </div>
+              <div>
+                <h4 className="font-bold text-xs text-slate-800 dark:text-slate-200 group-hover:text-blue-500 dark:group-hover:text-blue-450 transition-colors">Office Intake Staff</h4>
+                <p className="text-[10px] text-slate-500 dark:text-slate-400 font-medium mt-0.5">Register clients, book slots & upload audio</p>
+              </div>
+              <span className="px-3 py-1 bg-blue-500/10 text-blue-600 dark:text-blue-400 text-[9px] font-bold uppercase tracking-wider rounded-xl border border-blue-500/20">
+                Connect
+              </span>
+            </Link>
+
+          </div>
+        </div>
+
         {/* Live Platform Metrics Bar */}
         <div className="pt-6 max-w-4xl mx-auto">
           <div className="grid grid-cols-2 md:grid-cols-4 gap-6 p-6 bg-white/40 dark:bg-dark-900/40 border border-slate-200/50 dark:border-dark-800/85 backdrop-blur-md rounded-3xl shadow-lg dark:shadow-none animate-fade-in">
