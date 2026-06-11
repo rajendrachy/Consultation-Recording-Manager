@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { User, Mail, Shield, Key, Loader2, CheckCircle, Camera } from 'lucide-react';
 import useAuthStore from '../store/authStore';
 import api from '../services/api';
+import { getMediaUrl } from '../config';
 
 const Profile = () => {
   const { user, updateProfile } = useAuthStore();
@@ -13,14 +14,6 @@ const Profile = () => {
   const [avatarPreview, setAvatarPreview] = useState(user?.avatar || '');
   const [profileLoading, setProfileLoading] = useState(false);
   const [profileError, setProfileError] = useState('');
-
-  const getMediaUrl = (url) => {
-    if (!url) return '';
-    if (url.startsWith('/uploads/')) {
-      return `http://localhost:5000${url}`;
-    }
-    return url;
-  };
 
   const handleAvatarChange = async (e) => {
     const file = e.target.files[0];

@@ -24,6 +24,7 @@ import {
 import useAuthStore from '../store/authStore';
 import useThemeStore from '../store/themeStore';
 import api from '../services/api';
+import { getMediaUrl } from '../config';
 
 const DashboardLayout = ({ children }) => {
   const { user, logout } = useAuthStore();
@@ -44,14 +45,6 @@ const DashboardLayout = ({ children }) => {
 
   const profileRef = useRef(null);
   const notifRef = useRef(null);
-
-  const getMediaUrl = (url) => {
-    if (!url) return '';
-    if (url.startsWith('/uploads/')) {
-      return `http://localhost:5000${url}`;
-    }
-    return url;
-  };
 
   // Initialize theme
   useEffect(() => {

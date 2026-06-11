@@ -17,6 +17,7 @@ import {
 } from 'lucide-react';
 import api from '../services/api';
 import useAuthStore from '../store/authStore';
+import { getMediaUrl } from '../config';
 
 const Recordings = () => {
   const { user } = useAuthStore();
@@ -121,13 +122,7 @@ const Recordings = () => {
     }
   };
 
-  // Helper to format source URLs (local paths prepend backend host)
-  const getMediaUrl = (url) => {
-    if (url.startsWith('/uploads/')) {
-      return `http://localhost:5000${url}`;
-    }
-    return url;
-  };
+  // Highlight smart search words inside transcript text
 
   // Highlight smart search words inside transcript text
   const getHighlightedText = (text, query) => {
