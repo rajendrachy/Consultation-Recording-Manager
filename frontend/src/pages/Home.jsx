@@ -20,12 +20,172 @@ import {
   Check,
   Sun,
   Moon,
+  Play,
+  HardDrive,
+  Shield,
 } from 'lucide-react';
 import useThemeStore from '../store/themeStore';
+
+const simulationSteps = [
+  {
+    step: 0,
+    title: "System Standby",
+    icon: UploadCloud,
+    color: "slate",
+    badge: "Idle",
+    statusText: "crm_core: Event loop ready. Awaiting intake trigger...",
+    log: {
+      status: "system_idle",
+      listeners: "listening_on_port_5000",
+      websocket_pool: "connected_14_nodes",
+      event: "awaiting_consultation_upload_trigger"
+    }
+  },
+  {
+    step: 1,
+    title: "Audio Intake & Validation",
+    icon: UploadCloud,
+    color: "teal",
+    badge: "Ingesting",
+    statusText: "intake_service: streaming raw bytes to buffer. Running integrity verification...",
+    log: {
+      event: "consultation_intake_triggered",
+      payload: {
+        fileName: "Consultation_John_Doe_0611.mp3",
+        fileSize: "44,040,192_bytes",
+        mimeType: "audio/mpeg",
+        integrityCheck: "SHA-256_MATCH_OK"
+      },
+      validation: {
+        headers: "valid",
+        sessionToken: "JWT_verified_staff_role"
+      },
+      action: "routing_to_storage_engine"
+    }
+  },
+  {
+    step: 2,
+    title: "Secure Storage Engine",
+    icon: HardDrive,
+    color: "blue",
+    badge: "Syncing",
+    statusText: "storage_service: Cloudinary limit met (403). Falling back to secure AES-256-CBC local disk writer...",
+    log: {
+      event: "storage_routing_initialized",
+      primary: "Cloudinary_Bucket_Intake",
+      status: "attempting_cloudinary_stream",
+      debug: "rate_limit_approaching_initiating_fallback",
+      fallback: {
+        engine: "local_disk_write",
+        directory: "/uploads/consultations/secure",
+        encryption: "AES-256-CBC"
+      },
+      storageResult: "local_storage_fallback_write_success_200_OK"
+    }
+  },
+  {
+    step: 3,
+    title: "Whisper AI Transcription",
+    icon: Cpu,
+    color: "cyan",
+    badge: "Transcribing",
+    statusText: "whisper_ai: model loaded in GPU VRAM. Ingesting buffer, executing transformer...",
+    log: {
+      event: "whisper_nlp_transcription_triggered",
+      model: "whisper-large-v3-optimized",
+      precision: "float16",
+      metrics: {
+        audioDuration: "242s",
+        wordsProcessed: 840,
+        averageConfidence: 0.9841
+      },
+      nlpAnalysis: {
+        summarizer: "bart-large-cnn-summary-extraction",
+        sentiment: "neutral_clinical",
+        entitiesExtracted: ["John Doe", "replications", "latency"]
+      }
+    }
+  },
+  {
+    step: 4,
+    title: "RBAC Shield & Commit",
+    icon: Shield,
+    color: "rose",
+    badge: "Authorizing",
+    statusText: "rbac_guard: JWT claim valid. Updating MongoDB replica cluster. Broadcasting WS updates...",
+    log: {
+      event: "authorization_rbac_routing",
+      policies: ["admin_override", "consultant_read", "staff_write"],
+      authAction: "route_secured_under_policy_L4",
+      databaseCommit: {
+        document: "consultation_record_6198df",
+        collection: "recordings",
+        action: "insert_one",
+        acknowledgement: true
+      },
+      dispatch: "websocket_event_broadcast_active_clients"
+    }
+  }
+];
+
+const renderJSON = (obj) => {
+  const jsonString = JSON.stringify(obj, null, 2);
+  return jsonString.split('\n').map((line, i) => {
+    const match = line.match(/^(\s*)"([^"]+)":\s*(.*)$/);
+    if (match) {
+      const indent = match[1];
+      const key = match[2];
+      let val = match[3];
+      
+      let valClass = "text-slate-350 dark:text-slate-450";
+      if (val.startsWith('"')) {
+        valClass = "text-emerald-500 dark:text-emerald-400 font-medium";
+      } else if (val.startsWith('true') || val.startsWith('false')) {
+        valClass = "text-indigo-500 dark:text-indigo-400 font-bold";
+      } else if (val.endsWith(',') ? !isNaN(parseInt(val.slice(0, -1))) : !isNaN(parseInt(val))) {
+        valClass = "text-amber-500 dark:text-amber-400";
+      } else if (val.startsWith('{') || val.startsWith('[')) {
+        valClass = "text-slate-400";
+      }
+      
+      return (
+        <div key={i} className="whitespace-pre">
+          {indent}
+          <span className="text-teal-600 dark:text-teal-400 font-bold">"{key}"</span>:{" "}
+          <span className={valClass}>{val}</span>
+        </div>
+      );
+    }
+    return <div key={i} className="whitespace-pre">{line}</div>;
+  });
+};
 
 const Home = () => {
   const { darkMode, toggleDarkMode } = useThemeStore();
   const [activeRole, setActiveRole] = useState('admin');
+  
+  const [simStep, setSimStep] = useState(0);
+  const [simLoading, setSimLoading] = useState(false);
+
+  const runSimulation = () => {
+    if (simLoading) return;
+    setSimLoading(true);
+    setSimStep(1);
+    
+    setTimeout(() => {
+      setSimStep(2);
+      setTimeout(() => {
+        setSimStep(3);
+        setTimeout(() => {
+          setSimStep(4);
+          setTimeout(() => {
+            setSimStep(0);
+            setSimLoading(false);
+          }, 3000);
+        }, 3000);
+      }, 3000);
+    }, 3000);
+  };
 
   const rolesData = {
     admin: {
@@ -458,6 +618,277 @@ const Home = () => {
               <p className="text-slate-500 dark:text-slate-400 text-xs leading-relaxed">
                 Review storage capacity, recent logs, monthly trends, and consultant performance indices on visual chart layouts.
               </p>
+            </div>
+
+          </div>
+        </div>
+      </section>
+
+      {/* System Event Loop & Data Flow Simulator */}
+      <section className="bg-slate-100/50 dark:bg-dark-950/20 border-b border-slate-200/60 dark:border-dark-850/80 py-24 px-6 relative overflow-hidden">
+        {/* Glow backgrounds */}
+        <div className="absolute top-1/2 left-1/4 w-96 h-96 bg-teal-500/5 blur-3xl rounded-full pointer-events-none" />
+        <div className="absolute bottom-0 right-1/4 w-96 h-96 bg-blue-500/5 blur-3xl rounded-full pointer-events-none" />
+
+        <div className="max-w-7xl mx-auto space-y-16">
+          <div className="text-center space-y-3">
+            <div className="inline-flex items-center gap-1.5 px-3 py-1 bg-teal-500/10 border border-teal-500/20 text-teal-650 dark:text-teal-400 rounded-full text-[10px] font-bold tracking-widest uppercase">
+              Data Pipeline Telemetry
+            </div>
+            <h2 className="text-3xl sm:text-4xl font-extrabold tracking-tight">System Event Loop & Data Flow</h2>
+            <p className="text-slate-500 dark:text-slate-400 max-w-xl mx-auto text-xs sm:text-sm">
+              Visualize the real-time pipeline of a consultation recording as it travels from ingestion through storage routing, AI processing, and security authorization.
+            </p>
+          </div>
+
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-stretch">
+            
+            {/* Visual Node Flow */}
+            <div className="lg:col-span-7 flex flex-col justify-between space-y-8">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 relative">
+                {simulationSteps.slice(1).map((step, idx) => {
+                  const StepIcon = step.icon;
+                  const stepNum = idx + 1;
+                  const isCurrent = simStep === stepNum;
+                  const isCompleted = simStep > stepNum;
+                  const isIdle = simStep === 0;
+
+                  // Dynamic Card Classes based on status
+                  let cardBorder = "border-slate-200/70 dark:border-dark-800/80";
+                  let cardBg = "bg-white/40 dark:bg-dark-900/40";
+                  let glowShadow = "shadow-sm";
+                  let scale = "hover:scale-[1.01]";
+                  let ring = "";
+                  
+                  if (!isIdle) {
+                    if (isCurrent) {
+                      scale = "scale-[1.03]";
+                      switch(stepNum) {
+                        case 1:
+                          cardBorder = "border-teal-500";
+                          cardBg = "bg-teal-500/5 dark:bg-teal-950/20";
+                          glowShadow = "shadow-lg shadow-teal-500/10 dark:shadow-teal-500/5";
+                          ring = "ring-2 ring-teal-500/20";
+                          break;
+                        case 2:
+                          cardBorder = "border-blue-500";
+                          cardBg = "bg-blue-500/5 dark:bg-blue-950/20";
+                          glowShadow = "shadow-lg shadow-blue-500/10 dark:shadow-blue-500/5";
+                          ring = "ring-2 ring-blue-500/20";
+                          break;
+                        case 3:
+                          cardBorder = "border-cyan-500";
+                          cardBg = "bg-cyan-500/5 dark:bg-cyan-950/20";
+                          glowShadow = "shadow-lg shadow-cyan-500/10 dark:shadow-cyan-500/5";
+                          ring = "ring-2 ring-cyan-500/20";
+                          break;
+                        case 4:
+                          cardBorder = "border-rose-500";
+                          cardBg = "bg-rose-500/5 dark:bg-rose-950/20";
+                          glowShadow = "shadow-lg shadow-rose-500/10 dark:shadow-rose-500/5";
+                          ring = "ring-2 ring-rose-500/20";
+                          break;
+                      }
+                    } else if (isCompleted) {
+                      cardBorder = "border-emerald-500/45 dark:border-emerald-550/30";
+                      cardBg = "bg-emerald-500/5 dark:bg-emerald-950/10";
+                    } else {
+                      cardBg = "bg-white/10 dark:bg-dark-900/10 opacity-40";
+                    }
+                  }
+
+                  // Active icon theme
+                  let iconBg = "bg-slate-100 dark:bg-dark-800 text-slate-500 dark:text-slate-400";
+                  if (isCurrent || isCompleted) {
+                    switch(step.color) {
+                      case 'teal': iconBg = "bg-teal-50 dark:bg-teal-950/30 text-teal-650 dark:text-teal-400"; break;
+                      case 'blue': iconBg = "bg-blue-50 dark:bg-blue-950/30 text-blue-650 dark:text-blue-400"; break;
+                      case 'cyan': iconBg = "bg-cyan-50 dark:bg-cyan-950/30 text-cyan-650 dark:text-cyan-400"; break;
+                      case 'rose': iconBg = "bg-rose-50 dark:bg-rose-950/30 text-rose-650 dark:text-rose-400"; break;
+                    }
+                  }
+
+                  return (
+                    <div 
+                      key={stepNum}
+                      className={`relative p-6 rounded-3xl border backdrop-blur-md transition-all duration-500 flex flex-col justify-between space-y-4 ${cardBorder} ${cardBg} ${glowShadow} ${scale} ${ring}`}
+                    >
+                      {/* Step Completed Indicator Check */}
+                      {isCompleted && (
+                        <div className="absolute top-4 right-4 w-5 h-5 rounded-full bg-emerald-500 text-white flex items-center justify-center shadow-md animate-scale-in">
+                          <Check size={11} strokeWidth={3.5} />
+                        </div>
+                      )}
+
+                      {/* Active Status Pulse Indicator Dot */}
+                      {isCurrent && (
+                        <div className="absolute top-4 right-4 flex h-2.5 w-2.5">
+                          <span className={`animate-ping absolute inline-flex h-full w-full rounded-full opacity-75 ${
+                            step.color === 'teal' ? 'bg-teal-400' :
+                            step.color === 'blue' ? 'bg-blue-400' :
+                            step.color === 'cyan' ? 'bg-cyan-400' : 'bg-rose-400'
+                          }`} />
+                          <span className={`relative inline-flex rounded-full h-2.5 w-2.5 ${
+                            step.color === 'teal' ? 'bg-teal-500' :
+                            step.color === 'blue' ? 'bg-blue-500' :
+                            step.color === 'cyan' ? 'bg-cyan-500' : 'bg-rose-500'
+                          }`} />
+                        </div>
+                      )}
+
+                      <div className="space-y-4">
+                        <div className={`p-3 rounded-2xl w-fit ${iconBg} transition-colors duration-300`}>
+                          <StepIcon size={20} />
+                        </div>
+                        <div className="space-y-1">
+                          <div className="flex items-center gap-2">
+                            <span className="text-[10px] font-bold text-slate-400 dark:text-slate-500 font-mono">0{stepNum}</span>
+                            <h3 className="font-bold text-sm text-slate-800 dark:text-slate-200">{step.title}</h3>
+                          </div>
+                          <p className="text-slate-500 dark:text-slate-400 text-[11px] leading-relaxed">
+                            {stepNum === 1 && "Ingests media streams, executes file integrity validation, and verifies security metadata."}
+                            {stepNum === 2 && "Transmits files to Cloudinary CDN, automatically falling back to encrypted local storage in real-time."}
+                            {stepNum === 3 && "Feeds audio bytes to Whisper LLM running float16 models, generating transcripts and clinical key summary indexes."}
+                            {stepNum === 4 && "Authenticates user JWT claims, performs database write commits, and dispatches real-time UI websocket events."}
+                          </p>
+                        </div>
+                      </div>
+
+                      {/* Step Indicator Badge */}
+                      <div className="flex items-center justify-between pt-2 border-t border-slate-200/30 dark:border-dark-800/40">
+                        <span className="text-[9px] font-bold uppercase tracking-wider text-slate-400 dark:text-slate-500">Node Status</span>
+                        <span className={`px-2 py-0.5 rounded-md text-[9px] font-bold uppercase tracking-wider border ${
+                          isCurrent 
+                            ? step.color === 'teal' ? 'bg-teal-500/10 text-teal-500 border-teal-500/20' :
+                              step.color === 'blue' ? 'bg-blue-500/10 text-blue-500 border-blue-500/20' :
+                              step.color === 'cyan' ? 'bg-cyan-500/10 text-cyan-500 border-cyan-500/20' :
+                              'bg-rose-500/10 text-rose-500 border-rose-500/20'
+                            : isCompleted
+                              ? 'bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border-emerald-500/20'
+                              : 'bg-slate-100 dark:bg-dark-800 text-slate-450 dark:text-slate-500 border-transparent'
+                        }`}>
+                          {isCurrent ? step.badge : isCompleted ? 'Success' : 'Standby'}
+                        </span>
+                      </div>
+
+                      {/* Desktop Connectors using absolute placements between grids */}
+                      {idx === 0 && (
+                        <div className="hidden sm:block absolute top-1/2 -translate-y-1/2 left-full w-6 z-20">
+                          <div className={`h-0.5 w-full transition-colors duration-500 ${
+                            simStep > 1 ? 'bg-emerald-500' : simStep === 1 ? 'bg-teal-500 animate-pulse' : 'bg-slate-200 dark:bg-dark-800'
+                          }`} />
+                        </div>
+                      )}
+                      {idx === 2 && (
+                        <div className="hidden sm:block absolute top-1/2 -translate-y-1/2 left-full w-6 z-20">
+                          <div className={`h-0.5 w-full transition-colors duration-500 ${
+                            simStep > 3 ? 'bg-emerald-500' : simStep === 3 ? 'bg-cyan-500 animate-pulse' : 'bg-slate-200 dark:bg-dark-800'
+                          }`} />
+                        </div>
+                      )}
+                    </div>
+                  );
+                })}
+              </div>
+
+              {/* Simulation Run Control Panel */}
+              <div className="p-6 bg-white/40 dark:bg-dark-900/40 border border-slate-250 dark:border-dark-800/80 backdrop-blur-md rounded-3xl flex flex-col sm:flex-row items-center justify-between gap-4">
+                <div className="space-y-1 text-center sm:text-left">
+                  <h4 className="font-bold text-xs">Run Live Flow Simulation</h4>
+                  <p className="text-[10px] text-slate-500 dark:text-slate-400">Trigger the event loop to see complete record processing lifecycle telemetry logs.</p>
+                </div>
+                
+                <div className="flex items-center gap-3 w-full sm:w-auto justify-center">
+                  {!simLoading ? (
+                    <button 
+                      onClick={runSimulation}
+                      className="px-5 py-2.5 bg-gradient-to-r from-teal-500 via-teal-650 to-cyan-500 text-white text-xs font-bold rounded-xl flex items-center gap-1.5 shadow-md shadow-teal-500/10 hover:shadow-lg transition-all hover:scale-[1.02] active:scale-[0.98]"
+                    >
+                      <Play size={12} className="fill-white" />
+                      <span>Run Simulation</span>
+                    </button>
+                  ) : (
+                    <button 
+                      disabled
+                      className="px-5 py-2.5 bg-slate-100 dark:bg-dark-800 text-slate-450 dark:text-slate-550 text-xs font-bold rounded-xl flex items-center gap-2 border border-slate-200 dark:border-dark-750 cursor-not-allowed"
+                    >
+                      <span className="relative flex h-2 w-2">
+                        <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-teal-400 opacity-75 animate-duration-1000"></span>
+                        <span className="relative inline-flex rounded-full h-2 w-2 bg-teal-500"></span>
+                      </span>
+                      <span>Processing Step {simStep}/4...</span>
+                    </button>
+                  )}
+                  {simStep > 0 && (
+                    <button 
+                      onClick={() => {
+                        setSimStep(0);
+                        setSimLoading(false);
+                      }}
+                      className="px-4 py-2.5 bg-white dark:bg-dark-900 border border-slate-200 dark:border-dark-800 hover:bg-slate-50 dark:hover:bg-dark-800 text-slate-650 dark:text-slate-350 hover:text-rose-500 dark:hover:text-rose-450 text-xs font-bold rounded-xl transition-all"
+                    >
+                      Reset
+                    </button>
+                  )}
+                </div>
+              </div>
+            </div>
+
+            {/* Live Terminal Logger */}
+            <div className="lg:col-span-5 flex flex-col justify-between border border-slate-250 dark:border-dark-800 bg-[#070b14]/95 backdrop-blur-md rounded-3xl overflow-hidden shadow-xl dark:shadow-none min-h-[380px]">
+              {/* Terminal Window Header Bar */}
+              <div className="px-4 py-3 border-b border-slate-800/80 bg-slate-900/60 flex items-center justify-between">
+                <div className="flex items-center gap-1.5">
+                  <div className="w-3 h-3 rounded-full bg-red-500/80" />
+                  <div className="w-3 h-3 rounded-full bg-yellow-500/80" />
+                  <div className="w-3 h-3 rounded-full bg-emerald-500/80" />
+                  <span className="text-[10px] text-slate-500 font-mono font-medium ml-2 select-none">system_event_loop.log</span>
+                </div>
+                
+                <div className="flex items-center gap-1.5">
+                  <span className={`relative flex h-2 w-2 ${simLoading ? 'block' : 'hidden'}`}>
+                    <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-teal-400 opacity-75"></span>
+                    <span className="relative inline-flex rounded-full h-2 w-2 bg-teal-500"></span>
+                  </span>
+                  <span className="text-[9px] font-mono font-extrabold uppercase tracking-widest text-slate-400">
+                    {simLoading ? `Node_0${simStep}` : 'Standby'}
+                  </span>
+                </div>
+              </div>
+
+              {/* Logger Display Output Area */}
+              <div className="flex-1 p-5 font-mono text-[11px] leading-relaxed overflow-y-auto max-h-[340px] text-slate-400 space-y-4">
+                <div className="text-slate-500 select-none"># Consultation Recording Lifecycle Event Stream</div>
+                
+                {/* Syntax Highlighted JSON events packet */}
+                <div className="bg-black/30 p-4 border border-slate-850/60 rounded-2xl overflow-x-auto">
+                  {renderJSON(simulationSteps[simStep].log)}
+                </div>
+
+                {/* Console System Log Action */}
+                <div className="flex items-start gap-2 pt-2 border-t border-slate-850/60">
+                  <span className="text-emerald-500 select-none">&gt;&gt;</span>
+                  <div className="text-[10px] text-slate-350 select-none leading-snug">
+                    <span className="text-emerald-500 dark:text-emerald-450 font-semibold">{simulationSteps[simStep].statusText}</span>
+                    {simLoading && <span className="animate-pulse ml-0.5">█</span>}
+                  </div>
+                </div>
+              </div>
+
+              {/* Bottom Telemetry Metrics Progress tracking bar */}
+              <div className="border-t border-slate-850/60 bg-slate-900/20 p-4 space-y-2">
+                <div className="flex items-center justify-between text-[9px] font-mono text-slate-500 uppercase tracking-wider">
+                  <span>Pipeline Execution</span>
+                  <span>{simStep * 25}% complete</span>
+                </div>
+                <div className="w-full bg-slate-800/40 rounded-full h-1.5 overflow-hidden">
+                  <div 
+                    className="bg-gradient-to-r from-teal-500 via-cyan-500 to-rose-500 h-full transition-all duration-500 ease-out"
+                    style={{ width: `${simStep * 25}%` }}
+                  />
+                </div>
+              </div>
+
             </div>
 
           </div>
