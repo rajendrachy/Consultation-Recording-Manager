@@ -1,3 +1,6 @@
+
+Live Link :- https://consultation-recording-manager.vercel.app/
+
 # Consultation Recording Manager (MERN Stack)
 
 A secure, enterprise-grade SaaS-style platform built for managing, transcribing, and auditing consultation recordings. The application implements role-based access control (RBAC), simulated AI-powered transcription/summarization pipelines, Recharts analytics, and Cloudinary media cloud hosting with graceful local fallback channels.
